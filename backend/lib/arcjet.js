@@ -8,6 +8,7 @@ export const aj = arcjet({
     //prevent SQL injection, XSS, CSRF attacks
     shield({ mode: "LIVE" }),
     detectBot({ mode: "LIVE", allow: ["CATEGORY:SEARCH_ENGINE"] }),
+    //rate limit
     tokenBucket({
       mode: "LIVE",
       refillRate: 5,
