@@ -7,6 +7,38 @@ export const useProductStore = create((set, get) => ({
   loading: false,
   error: null,
 
+  formData: {
+    name: "",
+    price: "",
+    image: "",
+  },
+
+  setFormData: (formData) => set({ formData }),
+  resetForm: () => set({ formData: { name: "", price: "", image: "" } }),
+
+  addProduct: async (e) => {
+    e.preventDefault();
+
+    set({ loading: true, error: null });
+    try {
+      const { formData } = get();
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/products`,
+        formData
+      );
+      await get().fetchProducts();
+      get().resetForm();
+      toast.success("Product added successfully");
+
+      document.getElementById("add_product_modal").close();
+    } catch (error) {
+      set({ error: error.message });
+      toast.error("Error adding product");
+    } finally {
+      set({ loading: false });
+    }
+  },
+
   fetchProducts: async () => {
     set({ loading: true, error: null });
     try {
