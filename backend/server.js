@@ -3,19 +3,26 @@ import helmet from "helmet";
 import morgan from "morgan";
 import cors from "cors";
 import dotenv from "dotenv";
-import { aj } from "./lib/arcjet.js";
+import path from "path";
 
 import productRoute from "./routes/product.route.js";
+
 import { sql } from "./config/db.js";
+import { aj } from "./lib/arcjet.js";
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const __dirname = path.resolve();
 
 app.use(express.json());
 app.use(cors());
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+  })
+);
 app.use(morgan("dev"));
 
 app.use(async (req, res, next) => {
@@ -51,6 +58,14 @@ app.use(async (req, res, next) => {
 });
 
 app.use("/api/products", productRoute);
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../frontend/dist")));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+  });
+}
 
 async function initDB() {
   try {
