@@ -6,6 +6,7 @@ export const useProductStore = create((set, get) => ({
   products: [],
   loading: false,
   error: null,
+  currentProduct: null,
 
   formData: {
     name: "",
@@ -15,6 +16,7 @@ export const useProductStore = create((set, get) => ({
 
   setFormData: (formData) => set({ formData }),
   resetForm: () => set({ formData: { name: "", price: "", image: "" } }),
+  resetCurrentProduct: () => set({ currentProduct: null }),
 
   addProduct: async (e) => {
     e.preventDefault();
@@ -69,6 +71,43 @@ export const useProductStore = create((set, get) => ({
     } catch (error) {
       set({ error: error.message });
       toast.error("Error deleting product");
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  fetchProduct: async (id) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/products/${id}`
+      );
+
+      set({
+        currentProduct: response.data.data,
+        formData: response.data.data,
+        error: null,
+      });
+    } catch (error) {
+      set({ error: error.message, currentProduct: null });
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  updateProduct: async (id) => {
+    set({ loading: true, error: null });
+    try {
+      const { formData } = get();
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_URL}/api/products/${id}`,
+        formData
+      );
+      set({ currentProduct: response.data.data });
+      toast.success("Product updated successfully");
+    } catch (error) {
+      toast.error("Error updating product");
+      console.log(error);
     } finally {
       set({ loading: false });
     }

@@ -5,11 +5,20 @@ import ProductCard from "../components/ProductCard";
 import AddProductModal from "../components/AddProductModal";
 
 const HomePage = () => {
-  const { products, loading, error, fetchProducts } = useProductStore();
+  const {
+    products,
+    loading,
+    error,
+    fetchProducts,
+    resetCurrentProduct,
+    resetForm,
+  } = useProductStore();
 
   useEffect(() => {
     fetchProducts();
-  }, [fetchProducts]);
+    resetCurrentProduct();
+    resetForm();
+  }, [fetchProducts, resetCurrentProduct, resetForm]);
 
   return (
     <main className="max-w-6xl mx-auto px-4 py-8">
